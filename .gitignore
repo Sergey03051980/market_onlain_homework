@@ -1,0 +1,45 @@
+# Папки и файлы, которые нужно игнорировать
+
+# Виртуальное окружение (venv, .venv, env)
+venv/
+.venv/
+env/
+*.env/
+
+# Кэш Python и скомпилированные файлы
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+
+# Файлы IDE (PyCharm, VSCode)
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Логи и временные файлы
+*.log
+*.tmp
+*.bak
+
+# Конфигурационные файлы (если не нужно коммитить)
+*.env
+*.cfg
+*.ini
+
+# Файлы данных (если они генерируются автоматически)
+*.db
+*.sqlite
+*.csv
+
+# Jupyter Notebook (если не используется)
+.ipynb_checkpoints/
+*.ipynb
+
+# Системные файлы (Mac/Windows)
+.DS_Store
+Thumbs.db
