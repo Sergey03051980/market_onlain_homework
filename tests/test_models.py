@@ -31,17 +31,40 @@ def test_category_initialization(sample_category, sample_product):
     assert len(sample_category.products) == 1
     assert sample_category.products[0] == sample_product
 
-def test_category_count_increment(sample_category):
-    """Тест счетчика категорий"""
-    initial_count = Category.category_count
-    Category("New Category", "Description", [])
-    assert Category.category_count == initial_count + 1
 
-def test_product_count_increment(sample_product):
+def test_category_count_increment():
+    """Тест счетчика категорий"""
+    assert Category.category_count() == 0  # Теперь вызываем как метод
+
+    products = [
+        Product("Product 1", "Desc 1", 100, 5),
+        Product("Product 2", "Desc 2", 200, 3)
+    ]
+    Category("New Category", "Description", products)
+
+    assert Category.category_count() == 1  # Вызываем как метод
+
+
+@pytest.fixture(autouse=True)
+def reset_counters():
+    """Сбрасывает счетчики перед каждым тестом"""
+    Category._total_categories = 0
+    Category._total_products = 0
+    yield
+    # Дополнительный сброс после теста (опционально)
+    Category._total_categories = 0
+    Category._total_products = 0
+
+
+def test_product_count_increment():
     """Тест счетчика продуктов"""
-    initial_count = Category.product_count
-    Category("New Category", "Description", [sample_product, sample_product])
-    assert Category.product_count == initial_count + 2
+    assert Category.product_count() == 0
+
+    new_product = Product("New Product", "Desc", 500, 3)
+    Category("New Category", "Description", [new_product])
+
+    assert Category.product_count() == 1
+
 
 def test_load_from_json(json_path):
     """Тест загрузки данных из JSON"""
@@ -56,18 +79,19 @@ def test_load_from_json(json_path):
 
 def test_json_loading_counts(json_path):
     """Тест счетчиков после загрузки из JSON"""
-    initial_categories = Category.category_count
-    initial_products = Category.product_count
+    initial_categories = Category.category_count()
+    initial_products = Category.product_count()
 
     categories = load_categories_from_json(json_path)
     total_products = sum(len(c.products) for c in categories)
 
-    assert Category.category_count == initial_categories + len(categories)
-    assert Category.product_count == initial_products + total_products
+    assert Category.category_count() == initial_categories + len(categories)
+    assert Category.product_count() == initial_products + total_products
+
 
 def test_empty_category():
     """Тест создания категории без продуктов"""
     category = Category("Empty", "Category", [])
     assert len(category.products) == 0
-    assert Category.category_count > 0
-    assert Category.product_count >= 0
+    assert Category.category_count() > 0
+    assert Category.product_count() >= 0
