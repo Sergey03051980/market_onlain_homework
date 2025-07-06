@@ -18,20 +18,24 @@ def main():
     print("\n=== ДОПОЛНИТЕЛЬНЫЕ ТЕСТЫ ===")
     additional_tests()
 
+    # 4. Тестирование приватной цены
+    print("\n=== ТЕСТИРОВАНИЕ ПРИВАТНОЙ ЦЕНЫ ===")
+    test_private_price()
+
 
 def manual_demo():
     """Демонстрация ручного создания объектов"""
     # Сброс счетчиков
     Category.reset_counters()
 
-    # Создание товаров
+    # Создание товаров с использованием именованных параметров
     products = [
-        Product("Xiaomi", 25000.0, 10, "Смартфон"),
-        Product("Samsung", 45000.0, 5, "Планшет")
+        Product(name="Xiaomi", price=25000.0, quantity=10, description="Смартфон"),
+        Product(name="Samsung", price=45000.0, quantity=5, description="Планшет")
     ]
 
     # Создание категории
-    category = Category("Электроника", "Техника", products)
+    category = Category(name="Электроника", description="Техника", products=products)
 
     # Вывод информации
     print(f"Создана категория: {category}")
@@ -101,7 +105,7 @@ def additional_tests():
     print(category1.products)
     print(f"Всего продуктов: {Category.total_products}")
 
-    # Добавляем новый продукт (с исправленным вызовом)
+    # Добавляем новый продукт
     product4 = Product(
         name="55\" QLED 4K",
         price=123000.0,
@@ -113,51 +117,38 @@ def additional_tests():
     print(category1.products)
     print(f"Всего продуктов: {Category.total_products}")
 
-    # Добавляем продукты через метод add_product()
-    category1.add_product(product1)
-    category1.add_product(product2)
-    category1.add_product(product3)
 
-    # Выводим список товаров через геттер
-    print("Товары в категории:")
-    print(category1.products)
-    print(f"Всего продуктов: {Category.total_products}")
+def test_private_price():
+    """Тестирование работы с приватной ценой"""
+    print("\nТестирование приватной цены продукта:")
 
-    # Добавляем новый продукт
-    product4 = Product("55\" QLED 4K", "Фоновая подсветка", 123000.0, 7)
-    category1.add_product(product4)
-    print("\nПосле добавления нового товара:")
-    print(category1.products)
-    print(f"Всего продуктов: {Category.total_products}")
+    # Создаем тестовый продукт
+    test_product = Product(name="Тестовый", price=1000, quantity=1)
+    print(f"Создан продукт: {test_product}")
 
-    # Тестируем класс-метод new_product
-    print("\nТестирование класс-метода new_product:")
-    new_product = Product.new_product(
-        {"name": "Samsung Galaxy S23 Ultra",
-         "description": "256GB, Серый цвет, 200MP камера",
-         "price": 180000.0,
-         "quantity": 5}
-    )
-    print(f"Название: {new_product.name}")
-    print(f"Описание: {new_product.description}")
-    print(f"Цена: {new_product.price} руб.")
-    print(f"Количество: {new_product.quantity} шт.")
+    # 1. Проверяем геттер
+    print(f"Текущая цена: {test_product.price} руб.")
 
-    # Тестируем изменение цены
-    print("\nТестирование изменения цены:")
-    print(f"Текущая цена: {new_product.price} руб.")
+    # 2. Проверяем сеттер
+    test_product.price = 1500
+    print(f"Новая цена: {test_product.price} руб.")
 
-    print("\nПопытка установить цену 800 руб.:")
-    new_product.price = 800  # Должно запросить подтверждение (если реализовано доп. задание)
-    print(f"Новая цена: {new_product.price} руб.")
+    # 3. Пробуем установить недопустимые значения
+    try:
+        test_product.price = -100
+    except ValueError as e:
+        print(f"Ошибка при установке отрицательной цены: {e}")
 
-    print("\nПопытка установить отрицательную цену (-100 руб.):")
-    new_product.price = -100  # Должно вывести сообщение об ошибке
-    print(f"Цена осталась: {new_product.price} руб.")
+    try:
+        test_product.price = "тысяча"
+    except TypeError as e:
+        print(f"Ошибка при установке строки вместо числа: {e}")
 
-    print("\nПопытка установить нулевую цену:")
-    new_product.price = 0  # Должно вывести сообщение об ошибке
-    print(f"Цена осталась: {new_product.price} руб.")
+    # 4. Пробуем обратиться к приватному атрибуту
+    try:
+        print(test_product.__price)
+    except AttributeError as e:
+        print(f"Попытка доступа к приватному атрибуту __price: {e}")
 
 
 if __name__ == "__main__":
