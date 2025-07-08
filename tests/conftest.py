@@ -5,18 +5,29 @@ from src.models.category import Category
 
 @pytest.fixture
 def sample_product():
-    """Фикстура для тестового продукта"""
-    return Product("Test Product", "Test Description", 1000.0, 10)
+    return Product("Test Product", 1000.0, 10, "Test Description")
 
 @pytest.fixture
 def sample_category(sample_product):
-    """Фикстура для тестовой категории"""
     return Category("Test Category", "Test Description", [sample_product])
 
 @pytest.fixture
-def json_path():
-    """Фикстура с путем к тестовому JSON-файлу"""
-    path = Path(__file__).parent.parent / "data" / "products.json"
-    if not path.exists():
-        pytest.skip(f"Тестовый JSON файл не найден: {path}")
+def json_path(tmp_path):
+    path = tmp_path / "products.json"
+    data = [
+        {
+            "name": "Test Category",
+            "description": "Test Description",
+            "products": [
+                {
+                    "name": "Test Product",
+                    "price": 1000.0,
+                    "quantity": 10,
+                    "description": "Test Description"
+                }
+            ]
+        }
+    ]
+    import json
+    path.write_text(json.dumps(data), encoding='utf-8')
     return path
