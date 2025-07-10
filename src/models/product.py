@@ -1,33 +1,29 @@
 class Product:
     def __init__(self, name, price, quantity, description=None):
         self.name = name
-        self.__price = 0  # Приватный атрибут
+        self.__price = price
         self.quantity = quantity
         self.description = description
-        self.price = price  # Используем сеттер для инициализации
 
     @property
     def price(self):
-        """Геттер для цены"""
         return self.__price
 
     @price.setter
     def price(self, value):
-        """Сеттер для цены с валидацией"""
-        if not isinstance(value, (int, float)):
-            raise TypeError("Цена должна быть числом")
         if value <= 0:
-            raise ValueError("Цена должна быть положительным числом")
-        self.__price = float(value)
+            raise ValueError("Цена должна быть положительной")
+        self.__price = value
 
     def __str__(self):
-        """Для соответствия тестам"""
-        return f"Product('{self.name}', price={self.price})"
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other):
+        if not isinstance(other, Product):
+            raise TypeError("Можно складывать только объекты Product")
+        return self.price * self.quantity + other.price * other.quantity
 
     def __repr__(self):
-        """Для отладки и разработки"""
         return f"Product(name={self.name!r}, price={self.price}, quantity={self.quantity})"
 
-    def display_info(self):
-        """Пользовательское отображение информации о продукте"""
-        return f"{self.name}, {self.price} руб. Остаток: {self.quantity}"
+
