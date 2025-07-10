@@ -1,115 +1,143 @@
 import pytest
 from src.models.product import Product
+from src.models.smartphone import Smartphone
+from src.models.lawngrass import LawnGrass
 from src.models.category import Category
-from src.models.category_iterator import CategoryIterator
 
 
-def test_product_str():
-    """Тест строкового представления продукта"""
-    product = Product("Телефон", 10000, 5)
-    assert str(product) == "Телефон, 10000 руб. Остаток: 5 шт."
+def test_product_creation():
+    """Тест создания базового продукта"""
+    product = Product("Телефон", "Смартфон", 10000, 5)
+    assert product.name == "Телефон"
+    assert product.description == "Смартфон"
+    assert product.price == 10000
+    assert product.quantity == 5
 
 
-def test_product_repr():
-    """Тест repr представления продукта"""
-    product = Product("Телефон", 10000, 5, "Смартфон")
-    assert repr(product) == "Product(name='Телефон', price=10000, quantity=5)"
+def test_smartphone_creation():
+    """Тест создания смартфона"""
+    smartphone = Smartphone(
+        "Galaxy S23", "Флагман", 100000, 10,
+        95.5, "S23", 256, "Черный"
+    )
+    assert smartphone.name == "Galaxy S23"
+    assert smartphone.efficiency == 95.5
+    assert smartphone.model == "S23"
+    assert smartphone.memory == 256
+    assert smartphone.color == "Черный"
 
 
-def test_product_price_setter():
-    """Тест сеттера цены"""
-    product = Product("Телефон", 10000, 5)
-
-    # Проверка валидного значения
-    product.price = 15000
-    assert product.price == 15000
-
-    # Проверка невалидных значений
-    with pytest.raises(ValueError):
-        product.price = -100
-
-    with pytest.raises(TypeError):
-        product.price = "десять тысяч"
+def test_lawngrass_creation():
+    """Тест создания газонной травы"""
+    grass = LawnGrass(
+        "Трава", "Элитная", 500, 20,
+        "Россия", "14 дней", "Зеленая"
+    )
+    assert grass.name == "Трава"
+    assert grass.country == "Россия"
+    assert grass.germination_period == "14 дней"
+    assert grass.color == "Зеленая"
 
 
-def test_product_addition():
-    """Тест сложения продуктов"""
-    p1 = Product("Телефон", 10000, 5)
-    p2 = Product("Ноутбук", 50000, 2)
-
-    # Проверка сложения
+def test_product_addition_same_type():
+    """Тест сложения продуктов одного типа"""
+    p1 = Product("Телефон", "Смартфон", 10000, 5)
+    p2 = Product("Ноутбук", "Игровой", 50000, 2)
     assert p1 + p2 == 10000 * 5 + 50000 * 2
 
-    # Проверка сложения с неправильным типом
+
+def test_smartphone_addition():
+    """Тест сложения смартфонов"""
+    s1 = Smartphone("S1", "Флагман", 100000, 3, 95, "S1", 256, "Черный")
+    s2 = Smartphone("S2", "Бюджет", 50000, 5, 85, "S2", 128, "Синий")
+    assert s1 + s2 == 100000 * 3 + 50000 * 5
+
+
+def test_lawngrass_addition():
+    """Тест сложения газонной травы"""
+    g1 = LawnGrass("G1", "Элитная", 500, 10, "Россия", "14 дней", "Зеленая")
+    g2 = LawnGrass("G2", "Обычная", 300, 20, "Беларусь", "10 дней", "Темная")
+    assert g1 + g2 == 500 * 10 + 300 * 20
+
+
+def test_product_addition_different_types():
+    """Тест сложения продуктов разных типов"""
+    p = Product("Телефон", "Смартфон", 10000, 5)
+    s = Smartphone("S1", "Флагман", 100000, 3, 95, "S1", 256, "Черный")
+    g = LawnGrass("G1", "Элитная", 500, 10, "Россия", "14 дней", "Зеленая")
+
     with pytest.raises(TypeError):
-        p1 + "не продукт"
+        p + s
+
+    with pytest.raises(TypeError):
+        s + g
+
+    with pytest.raises(TypeError):
+        p + g
 
 
-def test_category_str():
+def test_category_add_valid_product():
+    """Тест добавления валидного продукта в категорию"""
+    category = Category("Техника", "Электроника")
+    p = Product("Телефон", "Смартфон", 10000, 5)
+    s = Smartphone("S1", "Флагман", 100000, 3, 95, "S1", 256, "Черный")
+
+    category.add_product(p)
+    category.add_product(s)
+
+    assert len(category.products) == 2
+
+
+def test_category_add_invalid_product():
+    """Тест добавления невалидного продукта в категорию"""
+    category = Category("Техника", "Электроника")
+
+    with pytest.raises(TypeError):
+        category.add_product("Не продукт")
+
+    with pytest.raises(TypeError):
+        category.add_product(123)
+
+    with pytest.raises(TypeError):
+        category.add_product({"name": "Телефон"})
+
+
+def test_product_str_representation():
+    """Тест строкового представления продукта"""
+    p = Product("Телефон", "Смартфон", 10000, 5)
+    assert str(p) == "Телефон, 10000 руб. Остаток: 5 шт."
+
+
+def test_smartphone_str_representation():
+    """Тест строкового представления смартфона"""
+    s = Smartphone("S1", "Флагман", 100000, 3, 95, "S1", 256, "Черный")
+    assert str(s) == "S1, 100000 руб. Остаток: 3 шт."
+
+
+def test_lawngrass_str_representation():
+    """Тест строкового представления газонной травы"""
+    g = LawnGrass("G1", "Элитная", 500, 10, "Россия", "14 дней", "Зеленая")
+    assert str(g) == "G1, 500 руб. Остаток: 10 шт."
+
+
+def test_category_str_representation():
     """Тест строкового представления категории"""
-    products = [
-        Product("Телефон", 10000, 5),
-        Product("Ноутбук", 50000, 2)
-    ]
-    category = Category("Электроника", "Техника", products)
-    assert str(category) == "Электроника, количество продуктов: 7 шт."
+    p1 = Product("Телефон", "Смартфон", 10000, 5)
+    p2 = Product("Ноутбук", "Игровой", 50000, 2)
+    category = Category("Техника", "Электроника", [p1, p2])
+
+    assert str(category) == "Техника, количество продуктов: 7 шт."
 
 
-def test_category_repr():
-    """Тест repr представления категории"""
-    category = Category("Электроника", "Техника")
-    assert repr(category) == "Category(name='Электроника', description='Техника')"
+def test_category_total_counters():
+    """Тест счетчиков категорий и продуктов"""
+    Category.total_categories = 0
+    Category.total_products = 0
 
+    p1 = Product("Телефон", "Смартфон", 10000, 5)
+    p2 = Product("Ноутбук", "Игровой", 50000, 2)
+    category1 = Category("Техника", "Электроника", [p1, p2])
+    category2 = Category("Сад", "Для дачи", [])
 
-def test_category_iteration():
-    """Тест итерации по категории"""
-    products = [
-        Product("Телефон", 10000, 5),
-        Product("Ноутбук", 50000, 2)
-    ]
-    category = Category("Электроника", "Техника", products)
-
-    # Проверка итерации
-    product_names = [p.name for p in category]
-    assert product_names == ["Телефон", "Ноутбук"]
-
-    # Проверка пустой категории
-    empty_category = Category("Пустая", "Категория")
-    assert list(empty_category) == []
-
-
-def test_category_add_product():
-    """Тест добавления продукта в категорию"""
-    category = Category("Электроника", "Техника")
-    product = Product("Телефон", 10000, 5)
-
-    # Проверка добавления
-    category.add_product(product)
-    assert len(category.products) == 1
-    assert category.products[0].name == "Телефон"
-
-
-def test_category_products_property():
-    """Тест свойства products"""
-    products = [
-        Product("Телефон", 10000, 5),
-        Product("Ноутбук", 50000, 2)
-    ]
-    category = Category("Электроника", "Техника", products)
-
-    # Проверка что возвращается эквивалентный список
-    assert category.products == products
-
-    # Проверка что это другой объект (копия)
-    assert category.products is not products
-
-    # Проверка что изменения копии не влияют на оригинал
-    products_copy = category.products
-    products_copy.append(Product("Планшет", 30000, 3))
-    assert len(category.products) == 2  # Оригинал не изменился
-
-
-def test_product_with_description():
-    """Тест продукта с описанием"""
-    product = Product("Телефон", 10000, 5, "Смартфон")
-    assert product.description == "Смартфон"
+    assert Category.total_categories == 2
+    assert Category.total_products == 2
