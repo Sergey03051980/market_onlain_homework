@@ -5,7 +5,7 @@ from src.models.category import Category
 
 @pytest.fixture
 def sample_product():
-    return Product("Test Product", 1000.0, 10, "Test Description")
+    return Product("Test Product", "Test Description", 1000.0, 10)
 
 @pytest.fixture
 def sample_category(sample_product):
