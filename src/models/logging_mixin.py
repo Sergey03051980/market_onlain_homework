@@ -1,9 +1,12 @@
 class LoggingMixin:
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)  # Сначала инициализируем родительские классы
         self._logged_message = (
             f"Создан объект {self.__class__.__name__} с параметрами: "
-            f"name={self.name}, description={self.description}, "
-            f"price={self.price}, quantity={self.quantity}"
+            f"name={getattr(self, 'name', '?')}, "
+            f"description={getattr(self, 'description', '?')}, "
+            f"price={getattr(self, 'price', '?')}, "
+            f"quantity={getattr(self, 'quantity', '?')}"
         )
         print(self._logged_message)
+        super().__init__(*args, **kwargs)
+
