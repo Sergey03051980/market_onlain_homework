@@ -129,3 +129,32 @@ pytest tests/ --cov=src --cov-report=html
    ```python
    product = Product("Телефон", "Смартфон", 10000, 5)
    
+##Покрытие тестами
+==================================================================== tests coverage ===================================================================== 
+____________________________________________________ coverage: platform win32, python 3.13.3-final-0 ____________________________________________________ 
+
+Name                          Stmts   Miss  Cover   Missing
+-----------------------------------------------------------
+src\models\__init__.py            7      0   100%
+src\models\base_product.py       10      5    50%   6-9, 13
+src\models\category.py           15      0   100%
+src\models\exceptions.py          2      0   100%
+src\models\lawngrass.py           7      0   100%
+src\models\logging_mixin.py       5      0   100%
+src\models\product.py            26      1    96%   27
+src\models\smartphone.py          8      5    38%   6-10
+-----------------------------------------------------------
+TOTAL                            80     11    86%
+=================================================================== 9 passed in 0.55s =================================================================== 
+
+Admin@DESKTOP-5SUVVSF MINGW64 ~/PycharmProjects/PythonProject_oop (feature_home_work_17.1)
+$ pytest --cov=src --cov-report=html tests/
+================================================================== test session starts ==================================================================
+platform win32 -- Python 3.13.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: C:\Users\Admin\PycharmProjects\PythonProject_oop
+configfile: pyproject.toml
+plugins: cov-6.2.1
+collected 9 items                                                                                                                                        
+
+tests\test_models.py .........                                                                                                                     [100%]
+

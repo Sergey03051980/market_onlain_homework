@@ -52,3 +52,70 @@ def test_logging_mixin_output(capsys):
     _ = Product(name="Test", description="Desc", price=100, quantity=5)
     captured = capsys.readouterr()
     assert "Создан объект Product с параметрами:" in captured.out
+
+
+def test_base_product_abstract():
+    """Проверка, что BaseProduct действительно абстрактный"""
+    with pytest.raises(TypeError):
+        BaseProduct()  # Нельзя создать экземпляр абстрактного класса
+
+
+def test_lawngrass_creation():
+    grass = LawnGrass(
+        name="Газон",
+        description="Мягкий",
+        price=500,
+        quantity=10,
+        country="Россия",
+        germination_period="14 дней",
+        color="Зелёный"
+    )
+    assert grass.country == "Россия"
+    assert "Газон" in str(grass)
+
+    def test_smartphone_creation():
+        phone = Smartphone(
+            name="iPhone",
+            description="Флагман",
+            price=100000,
+            quantity=5,
+            performance="A15",
+            model="15 Pro",
+            memory="512GB",
+            color="Black"
+        )
+        assert phone.memory == "512GB"
+        assert "iPhone" in str(phone)
+
+
+    def test_smartphone_creation():
+        phone = Smartphone(
+            name="iPhone",
+            description="Флагман",
+            price=100000,
+            quantity=5,
+            performance="A15",
+            model="15 Pro",
+            memory="512GB",
+            color="Black"
+        )
+        assert phone.memory == "512GB"
+        assert "iPhone" in str(phone)
+
+
+def test_product_price_setter():
+    """Тест изменения цены"""
+    p = Product("Тест", "Описание", 100, 5)
+
+    # Проверка корректного значения
+    p.price = 200
+    assert p.price == 200
+
+    # Проверка отрицательного значения
+    with pytest.raises(ValueError) as excinfo:
+        p.price = -100
+    assert "Цена должна быть положительной" in str(excinfo.value)
+
+    # Проверка нулевого значения
+    with pytest.raises(ValueError):
+        p.price = 0
