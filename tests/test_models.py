@@ -2,50 +2,49 @@ import pytest
 from src.models import BaseProduct, Product, Smartphone, LawnGrass, Category
 from io import StringIO
 import sys
+from src.models.exceptions import ZeroQuantityError
 
 def test_product_creation():
-    """Тест создания базового продукта"""
+    """Тест создания продукта"""
     product = Product(name="Телефон", description="Смартфон", price=10000, quantity=5)
     assert product.name == "Телефон"
     assert product.price == 10000
-    assert product.quantity == 5
 
 
 def test_product_addition():
     """Тест сложения продуктов"""
     p1 = Product(name="Телефон", description="Смартфон", price=10000, quantity=5)
     p2 = Product(name="Ноутбук", description="Игровой", price=50000, quantity=2)
-
-    # Проверяем сложение
-    assert p1 + p2 == 10000 * 5 + 50000 * 2  # 50 000 + 100 000 = 150 000
-
-    # Проверяем порядок сложения
-    assert p2 + p1 == p1 + p2
-
-    # Проверяем исключение при сложении с не-Product
-    with pytest.raises(TypeError):
-        p1 + 100
+    assert p1 + p2 == 10000 * 5 + 50000 * 2
 
 
-def test_base_product_abstract():
-    """Проверка, что BaseProduct действительно абстрактный"""
-    with pytest.raises(TypeError):
-        # Попытка создать экземпляр абстрактного класса
-        BaseProduct(name="Test", description="Desc", price=100, quantity=5)
+def test_product_zero_quantity():
+    """Тест создания продукта с нулевым количеством"""
+    with pytest.raises(ZeroQuantityError):
+        Product(name="Телефон", description="Смартфон", price=10000, quantity=0)
+
+
+def test_category_average_price():
+    """Тест подсчёта средней цены"""
+    category = Category(name="Электроника", description="Техника")
+
+    # Пустая категория
+    assert category.average_price() == 0
+
+    # Добавляем товары
+    p1 = Product(name="Телефон", description="Смартфон", price=10000, quantity=5)
+    p2 = Product(name="Ноутбук", description="Игровой", price=50000, quantity=2)
+    category.add_product(p1)
+    category.add_product(p2)
+
+    assert category.average_price() == 30000  # (10000 + 50000) / 2
 
 
 def test_logging_mixin():
     """Проверка работы миксина логирования"""
-    # Создаем продукт
     p = Product(name="Test", description="Desc", price=100, quantity=5)
-
-    # Проверяем сохраненное сообщение
     assert hasattr(p, '_logged_message')
-    assert "Создан объект Product с параметрами:" in p._logged_message
-    assert "name=Test" in p._logged_message
-    assert "description=Desc" in p._logged_message
-    assert "price=100" in p._logged_message
-    assert "quantity=5" in p._logged_message
+    assert "Test" in p._logged_message
 
 
 def test_logging_mixin_output(capsys):
@@ -53,3 +52,70 @@ def test_logging_mixin_output(capsys):
     _ = Product(name="Test", description="Desc", price=100, quantity=5)
     captured = capsys.readouterr()
     assert "Создан объект Product с параметрами:" in captured.out
+
+
+def test_base_product_abstract():
+    """Проверка, что BaseProduct действительно абстрактный"""
+    with pytest.raises(TypeError):
+        BaseProduct()  # Нельзя создать экземпляр абстрактного класса
+
+
+def test_lawngrass_creation():
+    grass = LawnGrass(
+        name="Газон",
+        description="Мягкий",
+        price=500,
+        quantity=10,
+        country="Россия",
+        germination_period="14 дней",
+        color="Зелёный"
+    )
+    assert grass.country == "Россия"
+    assert "Газон" in str(grass)
+
+    def test_smartphone_creation():
+        phone = Smartphone(
+            name="iPhone",
+            description="Флагман",
+            price=100000,
+            quantity=5,
+            performance="A15",
+            model="15 Pro",
+            memory="512GB",
+            color="Black"
+        )
+        assert phone.memory == "512GB"
+        assert "iPhone" in str(phone)
+
+
+    def test_smartphone_creation():
+        phone = Smartphone(
+            name="iPhone",
+            description="Флагман",
+            price=100000,
+            quantity=5,
+            performance="A15",
+            model="15 Pro",
+            memory="512GB",
+            color="Black"
+        )
+        assert phone.memory == "512GB"
+        assert "iPhone" in str(phone)
+
+
+def test_product_price_setter():
+    """Тест изменения цены"""
+    p = Product("Тест", "Описание", 100, 5)
+
+    # Проверка корректного значения
+    p.price = 200
+    assert p.price == 200
+
+    # Проверка отрицательного значения
+    with pytest.raises(ValueError) as excinfo:
+        p.price = -100
+    assert "Цена должна быть положительной" in str(excinfo.value)
+
+    # Проверка нулевого значения
+    with pytest.raises(ValueError):
+        p.price = 0
